@@ -6,6 +6,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
+use OxidEsales\EshopCommunity\Internal\Application\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Password\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Password\Exception\PasswordHashException;
 use OxidEsales\EshopCommunity\Internal\Password\Service\PasswordHashBcryptService;
 use OxidEsales\EshopCommunity\Internal\Password\Service\PasswordHashServiceInterface;
@@ -19,16 +21,6 @@ class PasswordHasher
      * @var \OxidEsales\Eshop\Core\Hasher|PasswordHashServiceInterface
      */
     private $passwordHashService;
-
-    /**
-     * Returns password hash service
-     *
-     * @return \OxidEsales\Eshop\Core\Hasher|PasswordHashServiceInterface
-     */
-    protected function _getHasher()
-    {
-        return $this->passwordHashService;
-    }
 
     /**
      * Sets dependencies.
@@ -70,6 +62,16 @@ class PasswordHasher
     }
 
     /**
+     * Returns password hash service
+     *
+     * @return \OxidEsales\Eshop\Core\Hasher|PasswordHashServiceInterface
+     */
+    protected function _getHasher()
+    {
+        return $this->passwordHashService;
+    }
+
+    /**
      * @param PasswordHashServiceInterface $passwordHashService
      * @param string                       $salt
      *
@@ -78,7 +80,14 @@ class PasswordHasher
     private function getOptionsForHashService(PasswordHashServiceInterface $passwordHashService, string $salt): array
     {
         if ($passwordHashService instanceof PasswordHashBcryptService) {
-            $options = ['salt' => $salt];
+            $cost = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(PasswordServiceBridgeInterface::class)
+                ->getBcryptCostOption();
+            $options = [
+                'salt' => $salt,
+                'cost' => $cost
+            ];
         }
 
         return $options;
