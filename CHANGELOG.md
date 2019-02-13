@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - New methods:
   - `OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay::getValues` [PR-660](https://github.com/OXID-eSales/oxideshop_ce/pull/660)
   - `OxidEsales\EshopCommunity\Application\Model\Article::getStock` [PR-640](https://github.com/OXID-eSales/oxideshop_ce/pull/640)
+  - `OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generateStrongSalt` generates a salt, which is suitable for cryptographic use 
 - Log a warnings for missused db method calls [PR-649](https://github.com/OXID-eSales/oxideshop_ce/pull/649)
 - New blocks:
   - `admin_module_sortlist` in `admin/tpl/module_sortlist.tpl` [PR-534](https://github.com/OXID-eSales/oxideshop_ce/pull/534)
@@ -56,6 +57,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `\OxidEsales\EshopCommunity\Core\Email::setConfig`
 - `\OxidEsales\EshopCommunity\Core\Email::getConfig`
 - `blDoNotDisableModuleOnError` config option
+- `\OxidEsales\EshopCommunity\Core\OpenSSLFunctionalityChecker` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generate` use \OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generateStrongSalt instead
+- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::_getOpenSSLFunctionalityChecker` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::_customSaltGenerator` will no longer be needed and removed completely
 
 ## [6.3.3] - Unreleased
 

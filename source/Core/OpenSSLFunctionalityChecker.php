@@ -8,6 +8,8 @@ namespace OxidEsales\EshopCommunity\Core;
 
 /**
  * Class is responsible for openSSL functionality availability checking.
+ *
+ * @deprecated since v6.4.0 (2019-01-31); This class will be removed completely.
  */
 class OpenSSLFunctionalityChecker
 {
