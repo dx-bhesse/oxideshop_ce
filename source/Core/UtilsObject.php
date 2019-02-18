@@ -183,18 +183,16 @@ class UtilsObject
      * Creates and returns new object. If creation is not available, dies and outputs
      * error message.
      *
-     * @param string $className Name of class
-     *
-     * @throws SystemComponentException in case that class does not exists
+     * @param string $className     Name of class
+     * @param array  ...$parameters
      *
      * @return object
+     * @throws SystemComponentException in case that class does not exists
      */
-    public function oxNew($className)
+    public function oxNew($className, ...$parameters)
     {
-        $arguments = func_get_args();
-        array_shift($arguments);
-        $argumentsCount = count($arguments);
-        $shouldUseCache = $this->shouldCacheObject($className, $arguments);
+        $parameterCount = count($parameters);
+        $shouldUseCache = $this->shouldCacheObject($className, $parameters);
         if (!\OxidEsales\Eshop\Core\NamespaceInformationProvider::isNamespacedClass($className)) {
             $className = strtolower($className);
         }
@@ -207,7 +205,7 @@ class UtilsObject
             return static::$_aClassInstances[$storageKey];
         }
         if (!defined('OXID_PHP_UNIT') && $shouldUseCache) {
-            $cacheKey = ($argumentsCount) ? $storageKey . md5(serialize($arguments)) : $storageKey;
+            $cacheKey = $parameterCount ? $storageKey . md5(serialize($parameters)) : $storageKey;
             if (isset(static::$_aInstanceCache[$cacheKey])) {
                 return clone static::$_aInstanceCache[$cacheKey];
             }
@@ -219,7 +217,7 @@ class UtilsObject
             $realClassName = $this->getClassName($className);
             //expect __autoload() (oxfunctions.php) to do its job when class_exists() is called
             if (!class_exists($realClassName)) {
-                $exception =  new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
+                $exception = new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
                 /** Use setMessage here instead of passing it in constructor in order to test exception message */
                 $exception->setMessage('EXCEPTION_SYSTEMCOMPONENT_CLASSNOTFOUND' . ' ' . $realClassName);
                 throw $exception;
@@ -228,7 +226,7 @@ class UtilsObject
             $this->_aClassNameCache[$className] = $realClassName;
         }
 
-        $object = new $realClassName(...$arguments);
+        $object = new $realClassName(...$parameters);
         if (isset($cacheKey) && $shouldUseCache && $object instanceof \OxidEsales\Eshop\Core\Model\BaseModel) {
             static::$_aInstanceCache[$cacheKey] = clone $object;
         }

@@ -90,11 +90,11 @@ function cmpart($a, $b)
  * error message.
  *
  * @param string $className Name of class
- * @param mixed  ...$args   constructor arguments
+ * @param array  $parameters
  *
  * @return object
  */
-function oxNew($className)
+function oxNew($className, ...$parameters)
 {
     startProfile('oxNew');
     $arguments = func_get_args();
