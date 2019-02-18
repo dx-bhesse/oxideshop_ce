@@ -48,7 +48,7 @@ class ContextStub extends BasicContextStub implements ContextInterface
     /**
      * @return string
      */
-    public function getLogLevel()
+    public function getLogLevel(): string
     {
         return $this->logLevel;
     }
@@ -101,4 +101,19 @@ class ContextStub extends BasicContextStub implements ContextInterface
         return '';
     }
 
+    /**
+     * @return integer
+     */
+    public function getPasswordHashingBcryptCost(): int
+    {
+        return 4;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContainerCacheFile(): string
+    {
+        return '';
+    }
 }

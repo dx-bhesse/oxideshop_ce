@@ -39,9 +39,9 @@ class Context extends BasicContext implements ContextInterface
     /**
      * @return string
      */
-    public function getLogLevel()
+    public function getLogLevel(): string
     {
-        return $this->getConfigParameter('sLogLevel');
+        return $this->getConfigParameter('sLogLevel', '');
     }
 
     /**
@@ -57,9 +57,7 @@ class Context extends BasicContext implements ContextInterface
      */
     public function getRequiredContactFormFields(): array
     {
-        $contactFormRequiredFields = $this->getConfigParameter('contactFormRequiredFields');
-
-        return $contactFormRequiredFields === null ? [] : $contactFormRequiredFields;
+        return $this->getConfigParameter('contactFormRequiredFields', []);
     }
 
     /**
@@ -73,7 +71,7 @@ class Context extends BasicContext implements ContextInterface
     /**
      * @return string
      */
-    public function getContainerCacheFile()
+    public function getContainerCacheFile(): string
     {
         return $this->getConfigParameter('sCompileDir') . DIRECTORY_SEPARATOR . 'containercache.php';
     }
@@ -87,11 +85,21 @@ class Context extends BasicContext implements ContextInterface
     }
 
     /**
+     * @return integer
+     */
+    public function getPasswordHashingBcryptCost(): int
+    {
+        return $this->getConfigParameter('passwordHashingBcryptCost', 10);
+    }
+
+    /**
      * @param string $name
+     * @param null   $default
+     *
      * @return mixed
      */
-    private function getConfigParameter($name)
+    private function getConfigParameter($name, $default = null)
     {
-        return $this->config->getConfigParam($name);
+        return $this->config->getConfigParam($name, $default);
     }
 }

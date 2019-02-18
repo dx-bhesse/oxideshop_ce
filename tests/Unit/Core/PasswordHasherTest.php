@@ -3,23 +3,48 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxPasswordHasher;
+use OxidEsales\Eshop\Core\Hasher;
+use OxidEsales\Eshop\Core\PasswordHasher;
+use OxidEsales\EshopCommunity\Internal\Password\Exception\PasswordHashException;
+use OxidEsales\EshopCommunity\Internal\Password\Service\PasswordHashBcryptService;
 
 class PasswordHasherTest extends \OxidTestCase
 {
-
-    public function testHash()
+    public function testHashWithHasherImplementation()
     {
-        $sPassword = 'password';
-        $sSalt = 'salt';
+        $password = 'password';
+        $salt = 'salt';
 
-        $oHasher = $this->getMock('oxSha512Hasher');
-        $oHasher->expects($this->once())->method('hash')->with($this->equalTo($sPassword . $sSalt));
+        $passwordHashService = $this->getMock(Hasher::class);
+        $passwordHashService->expects($this->once())->method('hash')->with()->willReturn('somePasswordHash');
 
-        $oPasswordHasher = new oxPasswordHasher($oHasher);
+        $passwordHasher = new PasswordHasher($passwordHashService);
 
-        $oPasswordHasher->hash($sPassword, $sSalt);
+        $passwordHasher->hash($password, $salt);
+    }
+
+    public function testHashWithPasswordHashServiceInterfaceImplementation()
+    {
+        $password = 'password';
+        $salt = 'salt';
+
+        $passwordHashService = $this->getMock(PasswordHashBcryptService::class);
+        $passwordHashService->expects($this->once())->method('hash')->with()->willReturn('somePasswordHash');
+
+        $passwordHasher = new PasswordHasher($passwordHashService);
+
+        $passwordHasher->hash($password, $salt);
+    }
+
+    public function testConstructorThrowsExceptionOnUnsupportedPasswordHashService()
+    {
+        $this->expectException(PasswordHashException::class);
+
+        $passwordHashService = $this->getMock(\stdClass::class);
+
+        new PasswordHasher($passwordHashService);
     }
 }

@@ -3,67 +3,181 @@
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxPasswordSaltGenerator;
+use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\PasswordSaltGenerator;
+use OxidEsales\TestingLibrary\UnitTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class PasswordSaltGeneratorTest extends \OxidTestCase
+/**
+ * Class PasswordSaltGeneratorTest
+ */
+class PasswordSaltGeneratorTest extends UnitTestCase
 {
-
-    public function providerOpenSslRandomBytesGeneratorAvailability()
+    /**
+     */
+    public function testSaltLength()
     {
-        return array(
-            array(true),
-            array(false)
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+        $this->assertSame(32, strlen($generator->generate()));
+    }
+
+    /**
+     */
+    public function testGeneratedSaltShouldBeUnique()
+    {
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+        $salts = array();
+
+        for ($i = 1; $i <= 100; $i++) {
+            $salts[] = $generator->generate();
+        }
+
+        $this->assertCount(100, array_unique($salts));
+    }
+
+    /**
+     */
+    public function testGeneratePseudoRandomBytesReturnsEmptyStringIfNoRandomBytesGeneratorIsAvailable()
+    {
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $openSSLFunctionalityChecker->method('isOpenSslRandomBytesGeneratorAvailable')->willReturn(false);
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+
+        $randomBytes = $generator->generatePseudoRandomBytes();
+
+        $this->assertSame('', $randomBytes);
+    }
+
+    /**
+     */
+    public function testGenerateFallsBackToCustomSaltGeneratorIfGeneratePseudoRandomBytesFails()
+    {
+        $generatorMock = $this->getMockBuilder(PasswordSaltGenerator::class)
+            ->setMethods(['generatePseudoRandomBytes', '_customSaltGenerator'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $generatorMock->method('generatePseudoRandomBytes')->willReturn('');
+
+        $generatorMock
+            ->expects($this->once())
+            ->method('_customSaltGenerator')
+            ->willReturn('salt');
+
+        $generatorMock->generate();
+    }
+
+    /**
+     */
+    public function testGenerateStrongSaltProduces32CharsLongStringByDefault()
+    {
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+
+        $strongSalt = $generator->generateStrongSalt();
+
+        $this->assertSame(
+            32,
+            strlen($strongSalt)
         );
     }
 
     /**
-     * @dataProvider providerOpenSslRandomBytesGeneratorAvailability
      */
-    public function testSaltLength($blIsOpenSslRandomBytesGeneratorAvailable)
+    public function testGenerateStrongSaltProducesUniqueSalts()
     {
-        $oOpenSSLFunctionalityChecker = $this->_getOpenSSLFunctionalityChecker($blIsOpenSslRandomBytesGeneratorAvailable);
-        $oGenerator = new oxPasswordSaltGenerator($oOpenSSLFunctionalityChecker);
-        $this->assertSame(32, strlen($oGenerator->generate()));
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+
+        $salt_1 = $generator->generateStrongSalt();
+        $salt_2 = $generator->generateStrongSalt();
+
+        $this->assertNotSame($salt_1, $salt_2);
     }
 
     /**
-     * @dataProvider providerOpenSslRandomBytesGeneratorAvailability
      */
-    public function testGeneratedSaltShouldBeUnique($blIsOpenSslRandomBytesGeneratorAvailable)
+    public function testGenerateStrongSaltStringLengthIsCompatibleWithGenerate()
     {
-        $oOpenSSLFunctionalityChecker = $this->_getOpenSSLFunctionalityChecker($blIsOpenSslRandomBytesGeneratorAvailable);
-        $oGenerator = new oxPasswordSaltGenerator($oOpenSSLFunctionalityChecker);
-        $aSalts = array();
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
 
-        for ($i = 1; $i <= 100; $i++) {
-            $aSalts[] = $oGenerator->generate();
-        }
+        $strongSalt = $generator->generateStrongSalt();
+        $salt = $generator->generate();
 
-        $this->assertSame(100, count(array_unique($aSalts)));
+        $this->assertSame(
+            strlen($strongSalt),
+            strlen($salt)
+        );
     }
 
     /**
-     * Returns oxOpenSSLFunctionalityChecker object dependent on condition. It can return mocked object or not.
-     * This is needed because of environment. For example on php 5.2 there is no such function like openssl_random_pseudo_bytes
-     * so in that case we don't want to mock checker.
+     * @dataProvider validSaltLengthDataProvider
      *
-     * @param $blIsOpenSslRandomBytesGeneratorAvailable
-     *
-     * @return oxOpenSSLFunctionalityChecker
+     * @param int $validSaltLength
      */
-    private function _getOpenSSLFunctionalityChecker($blIsOpenSslRandomBytesGeneratorAvailable)
+    public function testGenerateStrongSaltReturnsStringOfRequestedLength(int $validSaltLength)
     {
-        if ($blIsOpenSslRandomBytesGeneratorAvailable) {
-            $oOpenSSLFunctionalityChecker = oxNew('oxOpenSSLFunctionalityChecker');
-        } else {
-            /** @var oxOpenSSLFunctionalityChecker $oOpenSSLFunctionalityChecker */
-            $oOpenSSLFunctionalityChecker = $this->getMock(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class, array('isOpenSslRandomBytesGeneratorAvailable'));
-            $oOpenSSLFunctionalityChecker->expects($this->any())->method('isOpenSslRandomBytesGeneratorAvailable')->will($this->returnValue($blIsOpenSslRandomBytesGeneratorAvailable));
-        }
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+
+        $salt = $generator->generateStrongSalt($validSaltLength);
+
+        $this->assertSame($validSaltLength, strlen($salt));
+    }
+
+    /**
+     * @return array
+     */
+    public function validSaltLengthDataProvider(): array
+    {
+        return [
+            ['saltLength' => 32],
+            ['saltLength' => 64],
+            ['saltLength' => 128],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidSaltLengthDataProvider
+     *
+     * @param int $invalidSaltLength
+     */
+    public function testGenerateStrongSaltThrowsExceptionForInvalidSaltLength(int $invalidSaltLength)
+    {
+        $openSSLFunctionalityChecker = $this->getOpenSSLFunctionalityChecker();
+        $generator = new PasswordSaltGenerator($openSSLFunctionalityChecker);
+
+        $this->expectException(StandardException::class);
+
+        $generator->generateStrongSalt($invalidSaltLength);
+    }
+
+    /**
+     * @return array
+     */
+    public function invalidSaltLengthDataProvider(): array
+    {
+        return [
+            ['saltLength' => -1],
+            ['saltLength' => 0],
+            ['saltLength' => 31],
+            ['saltLength' => 129],
+        ];
+    }
 
 
-        return $oOpenSSLFunctionalityChecker;
+    /**
+     * @return \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker|MockObject
+     */
+    private function getOpenSSLFunctionalityChecker(): \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker
+    {
+        $openSSLFunctionalityChecker = $this->getMockBuilder(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class)->getMock();
+
+        return $openSSLFunctionalityChecker;
     }
 }

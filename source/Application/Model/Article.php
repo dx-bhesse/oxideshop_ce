@@ -2372,7 +2372,7 @@ class Article extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             if (!isset($articleId)) {
                 $articleId = $this->oxarticles__oxid->value;
             }
-            if ($this->oxarticles__oxparentid->value) {
+            if ($this->oxarticles__oxparentid && $this->oxarticles__oxparentid->value) {
                 $parentArticleId = $this->oxarticles__oxparentid->value;
             }
         }
@@ -2508,7 +2508,7 @@ class Article extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
 
             if ($sDbValue != false) {
                 $this->_oLongDesc->setValue($sDbValue, \OxidEsales\Eshop\Core\Field::T_RAW);
-            } elseif ($this->oxarticles__oxparentid->value) {
+            } elseif ($this->oxarticles__oxparentid && $this->oxarticles__oxparentid->value) {
                 if (!$this->isAdmin() || $this->_blLoadParentData) {
                     $oParent = $this->getParentArticle();
                     if ($oParent) {
@@ -3126,7 +3126,7 @@ class Article extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function getParentArticle()
     {
-        if (($sParentId = $this->oxarticles__oxparentid->value)) {
+        if ($this->oxarticles__oxparentid && ($sParentId = $this->oxarticles__oxparentid->value)) {
             $sIndex = $sParentId . "_" . $this->getLanguage();
             if (!isset(self::$_aLoadedParents[$sIndex])) {
                 self::$_aLoadedParents[$sIndex] = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
