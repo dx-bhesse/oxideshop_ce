@@ -294,8 +294,20 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         }
 
         $this->_aUserCookie[$sShopId] = $sUser . '@@@' . crypt($sPassword, $sSalt);
-        $this->setOxCookie('oxid_' . $sShopId, $this->_aUserCookie[$sShopId], \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $iTimeout, '/', null, true, $blSsl);
-        $this->setOxCookie('oxid_' . $sShopId . '_autologin', '1', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $iTimeout, '/', null, true, false);
+        $this->setOxCookie(
+            'oxid_' . $sShopId,
+            $this->_aUserCookie[$sShopId],
+            \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $iTimeout,
+            '/',
+            null,
+            true,
+            $blSsl
+        );
+        $this->setOxCookie(
+            'oxid_' . $sShopId . '_autologin',
+            '1',
+            \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $iTimeout
+        );
     }
 
     /**
