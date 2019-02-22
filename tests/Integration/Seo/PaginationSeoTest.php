@@ -86,10 +86,10 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
      * We hit the 404 as no entry for this url exists in oxseo table.
      * But when shop shows the 404 page, it creates the main category seo urls.
      */
-    public function testCallWithSeoUrlNoEntryInTableExists()
+    public function testCallWithSeoUrlNoEntryInTableExistsReturnsHttpStatus404()
     {
         $seoUrl = $this->seoUrl;
-        $checkResponse = '404 Not Found';
+        $expectedHttpStatusCode = 404;
 
         //before
         $query = "SELECT oxstdurl, oxseourl FROM `oxseo` WHERE `OXSEOURL` like '%" . $seoUrl . "%'" .
@@ -98,8 +98,13 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $this->assertEmpty($res);
 
         //check what shop does
-        $response = $this->callCurl($seoUrl);
-        $this->assertContains($checkResponse, $response, "Should get $checkResponse");
+        list($httpStatusCode) = $this->callCurl($seoUrl);
+
+        $this->assertSame(
+            $expectedHttpStatusCode,
+            $httpStatusCode,
+            "Expected HTTP status code '$expectedHttpStatusCode'',  received '$httpStatusCode''"
+        );
     }
 
     /**
@@ -108,10 +113,10 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
      *
      *
      */
-    public function testCallWithStdUrlNoEntryExists()
+    public function testCallWithStdUrlNoEntryExistsReturnsHttpStatus200()
     {
         $urlToCall = 'index.php?cl=alist&cnid=' . $this->categoryOxid;
-        $checkResponse = 'HTTP/1.1 200 OK';
+        $expectedHttpStatusCode = 200;
 
         //Check entries in oxseo table for oxtype = 'oxcategory'
         $query = "SELECT oxstdurl, oxseourl FROM `oxseo` WHERE `OXSTDURL` like '%" . $this->categoryOxid . "%'" .
@@ -119,9 +124,13 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $res = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getAll($query);
         $this->assertEmpty($res);
 
-        $response = $this->callCurl($urlToCall);
+        list($httpStatusCode) = $this->callCurl($urlToCall);
 
-        $this->assertContains($checkResponse, $response, "Should get $checkResponse");
+        $this->assertSame(
+            $expectedHttpStatusCode,
+            $httpStatusCode,
+            "Expected HTTP status code '$expectedHttpStatusCode'',  received '$httpStatusCode''"
+        );
     }
 
     /**
@@ -549,7 +558,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         foreach ($prepareUrls as $url) {
             $this->callCurl($url);
         }
-        $response = $this->callCurl($urlToCall);
+        list(, $response)  = $this->callCurl($urlToCall);
 
         foreach ($responseContains as $checkFor){
             $this->assertContains($checkFor, $response, "Should get $checkFor");
@@ -568,15 +577,18 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $productSeoUrlsCountBeforeRequest = $this->getProductSeoUrlsCount($seoUrl);
 
-        $this->callCurl($seoUrl . '?pgNr=0');
+        list(, $response) = $this->callCurl($seoUrl . '?pgNr=0');
 
         $productSeoUrlsCountAfterRequest = $this->getProductSeoUrlsCount($seoUrl);
 
         $productsPerPage = 10;
+        $expectedNumberOfProductsPerPage = $productSeoUrlsCountBeforeRequest + $productsPerPage;
 
         $this->assertEquals(
-            $productSeoUrlsCountBeforeRequest + $productsPerPage,
-            $productSeoUrlsCountAfterRequest
+            $expectedNumberOfProductsPerPage,
+            $productSeoUrlsCountAfterRequest,
+            'Expected ' . $expectedNumberOfProductsPerPage . ' products per page, got '
+            . $productSeoUrlsCountAfterRequest . ' HTTP response: ' . $response
         );
     }
 
@@ -651,7 +663,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         for ($i = 1; $i <= 20; $i++) {
             $product = oxNew(Article::class);
-            $product->oxarticles__oxtitle = new Field($seoUrl, Field::T_RAW);
+            $product->oxarticles__oxtitle = new Field($seoUrl . '_' . $i, Field::T_RAW);
             $product->save();
 
             $relation = oxNew(Object2Category::class);
@@ -691,20 +703,25 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
     /**
      * @param string $fileUrlPart Shop url part to call.
      *
-     * @return string
+     * @return array
      */
     private function callCurl($fileUrlPart)
     {
+        // Wait for replication, if test was on master database and cURL call reads from slave database
+        $this->waitForMasterSlaveReplication();
+
         $url = $this->getConfig()->getShopMainUrl() . $fileUrlPart;
 
         $curl = oxNew(\OxidEsales\Eshop\Core\Curl::class);
         $curl->setOption('CURLOPT_HEADER', true);
         $curl->setUrl($url);
-        $return = $curl->execute();
+        $response = $curl->execute();
+        $httpStatusCode = $curl->getStatusCode();
 
-        sleep(0.5); // for master slave: please wait before checking the results.
+        // Wait for replication, if test was on slave database and cURL call initiated changes on master database
+        $this->waitForMasterSlaveReplication();
 
-        return $return;
+        return [$httpStatusCode, $response];
     }
 
     /**
@@ -734,5 +751,12 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $query = "SELECT oxstdurl, oxseourl FROM `oxseo` WHERE `OXSTDURL` like '%" . $this->categoryOxid . "%'" .
                  " AND oxtype = 'oxcategory'";
         return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getAll($query);
+    }
+
+    private function waitForMasterSlaveReplication()
+    {
+        if (!empty($this->getConfig()->getConfigParam('aSlaveHosts'))) {
+            sleep(0.25); // for master slave: please wait before checking the results.
+        }
     }
 }
