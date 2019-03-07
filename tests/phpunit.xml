@@ -22,7 +22,7 @@
         <!--<whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">Application</directory>
             <directory suffix=".php">Core</directory>
-        </whitelist>
+        </whitelist>-->
         <blacklist>
             <directory suffix=".php">Application/Controller/Admin/Report/</directory>
             <directory suffix=".php">Application/views/</directory>
@@ -73,6 +73,6 @@
                 <file>Core/Smarty/Plugin/prefilter.oxblock.php</file>
                 <file>Core/Smarty/Plugin/prefilter.oxtpldebug.php</file>
             </exclude>
-        </blacklist>-->
+        </blacklist>
     </filter>
 </phpunit>
