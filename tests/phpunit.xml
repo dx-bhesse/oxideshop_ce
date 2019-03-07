@@ -14,7 +14,7 @@
          stopOnIncomplete="false"
          stopOnSkipped="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         verbose="false">
+         verbose="true">
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">.</directory>
