@@ -17,6 +17,9 @@
          verbose="false">
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">.</directory>
+        </whitelist>
+        <!--<whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">Application</directory>
             <directory suffix=".php">Core</directory>
         </whitelist>
@@ -70,6 +73,6 @@
                 <file>Core/Smarty/Plugin/prefilter.oxblock.php</file>
                 <file>Core/Smarty/Plugin/prefilter.oxtpldebug.php</file>
             </exclude>
-        </blacklist>
+        </blacklist>-->
     </filter>
 </phpunit>
