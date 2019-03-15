@@ -53,6 +53,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed deprecated `\OxidEsales\EshopCommunity\Core\Email::$Version` use `\PHPMailer\PHPMailer\PHPMailer::VERSION` instead
 
 ### Deprecated
+- `\OxidEsales\EshopCommunity\Application\Model\User::_dbLogin` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Application\Model\User::_getLoginQuery` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Application\Model\User::encodePassword` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Application\Model\User::formQueryPartForMD5Password` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Application\Model\User::formQueryPartForSha512Password` will no longer be needed and removed completely
 - `\OxidEsales\EshopCommunity\Core\Base::setConfig`
 - `\OxidEsales\EshopCommunity\Core\Base::getConfig`
 - `\OxidEsales\EshopCommunity\Core\Email::$_oConfig`
@@ -60,9 +65,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `\OxidEsales\EshopCommunity\Core\Email::getConfig`
 - `blDoNotDisableModuleOnError` config option
 - `\OxidEsales\EshopCommunity\Core\OpenSSLFunctionalityChecker` will no longer be needed and removed completely
-- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generate` use \OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generateStrongSalt instead
-- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::_getOpenSSLFunctionalityChecker` will no longer be needed and removed completely
-- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::_customSaltGenerator` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\Hasher` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\PasswordHasher` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\PasswordSaltGenerator` will no longer be needed and removed completely
+- `\OxidEsales\EshopCommunity\Core\Sha512Hasher` will no longer be needed and removed completely
 
 ## [6.3.3] - Unreleased
 

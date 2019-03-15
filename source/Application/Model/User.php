@@ -1272,6 +1272,8 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param int    $shopId
      * @param bool   $isAdmin
      *
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely.
+     *
      * @return string
      */
     protected function _getLoginQuery($userName, $password, $shopId, $isAdmin)
@@ -1956,6 +1958,8 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $sPassword password to encode
      * @param string $sSalt     any unique string value
      *
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely.
+     *
      * @return string
      */
     public function encodePassword($sPassword, $sSalt)
@@ -2240,6 +2244,9 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $shopID   Shop id
      *
      * @throws UserException
+     *
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely. Verify the password directly
+     * against the password hash
      *
      * @return void
      */
@@ -2549,6 +2556,8 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string            $userCondition
      * @param string            $shopCondition
      *
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely.
+     *
      * @return string
      */
     protected function formQueryPartForSha512Password(string $password, DatabaseInterface $database, string $userCondition, string $shopCondition): string
@@ -2566,6 +2575,8 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * @param string            $password
      * @param DatabaseInterface $databaseb
+     *
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely.
      *
      * @return string
      */

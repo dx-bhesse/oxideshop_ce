@@ -10,13 +10,13 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 
 /**
  * Generates Salt for the user password
+ *
+ * @deprecated since v6.4.0 (2019-03-15); This class will be removed completely.
  */
 class PasswordSaltGenerator
 {
     /**
      * @var \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker
-     *
-     * @deprecated since v6.4.0 (2019-01-30); This property will be removed completely
      */
     private $_openSSLFunctionalityChecker;
 
@@ -24,8 +24,6 @@ class PasswordSaltGenerator
      * Sets dependencies.
      *
      * @param \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker $openSSLFunctionalityChecker
-     *
-     * @deprecated since v6.4.0 (2019-01-30); The constructor will be removed completely
      */
     public function __construct(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker $openSSLFunctionalityChecker)
     {
@@ -61,8 +59,6 @@ class PasswordSaltGenerator
     /**
      * Caution this method may return a string, that is not suitable for cryptographic use.
      *
-     * @deprecated since v6.4.0 (2019-01-30); This method will be removed completely, use \OxidEsales\EshopCommunity\Core\PasswordSaltGenerator::generateStrongSalt instead.
-     *
      * @return string
      */
     public function generate(): string
@@ -78,8 +74,6 @@ class PasswordSaltGenerator
     }
 
     /**
-     * @deprecated since v6.4.0 (2019-01-30); This method will be removed completely.
-     *
      * @return string
      */
     public function generatePseudoRandomBytes(): string
@@ -98,8 +92,6 @@ class PasswordSaltGenerator
     /**
      * Gets open SSL functionality checker.
      *
-     * @deprecated since v6.4.0 (2019-01-30); This method will be removed completely
-     *
      * @return \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker
      */
     protected function _getOpenSSLFunctionalityChecker(): \OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker
@@ -109,8 +101,6 @@ class PasswordSaltGenerator
 
     /**
      * Generates custom salt.
-     *
-     * @deprecated since v6.4.0 (2019-01-30); This method will be removed completely.
      *
      * @return string
      */
