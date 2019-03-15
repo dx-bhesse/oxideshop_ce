@@ -1958,7 +1958,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $sPassword password to encode
      * @param string $sSalt     any unique string value
      *
-     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely.
+     * @deprecated since v6.4.0 (2019-03-15); This method will be removed completely. User hashPassword instead
      *
      * @return string
      */
