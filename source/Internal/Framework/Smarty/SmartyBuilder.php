@@ -72,7 +72,7 @@ class SmartyBuilder implements SmartyBuilderInterface
     public function registerResources(array $resourcesToRegister)
     {
         foreach ($resourcesToRegister as $key => $resources) {
-            $this->smarty->register_resource($key, $resources);
+            $this->smarty->registerResource($key, $resources);
         }
         return $this;
     }
@@ -89,7 +89,7 @@ class SmartyBuilder implements SmartyBuilderInterface
         foreach ($prefilters as $prefilter => $path) {
             if (file_exists($path)) {
                 include_once $path;
-                $this->smarty->register_prefilter($prefilter);
+                $this->smarty->registerFilter('pre',$prefilter);
             }
         }
         return $this;

@@ -7,6 +7,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\DeliverySet;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -16,7 +17,7 @@ use stdClass;
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: Shop Settings -> Shipping & Handling -> RDFa.
  */
-class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\PaymentRdfa
+class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
     /**
      * Current class template name.
@@ -40,6 +41,15 @@ class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\Pay
         "FederalExpress"             => 1,
         "UPS"                        => 1
     ];
+
+    public function render()
+    {
+        $deliverySetId = $this->getEditObjectId();
+        if (isset($deliverySetId)) {
+            $this->_aViewData['edit'] = $this->getDeliverySet($deliverySetId);
+        }
+        return parent::render();
+    }
 
     /**
      * Saves changed mapping configurations
@@ -108,5 +118,16 @@ class DeliverySetRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\Pay
         }
 
         return $aRDFaDeliveries;
+    }
+
+    /**
+     * @param string $deliverySetId
+     * @return DeliverySet
+     */
+    private function getDeliverySet(string $deliverySetId): DeliverySet
+    {
+        $deliverySet = oxNew(DeliverySet::class);
+        $deliverySet->loadInLang($this->_iEditLang, $deliverySetId);
+        return $deliverySet;
     }
 }

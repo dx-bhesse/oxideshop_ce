@@ -66,7 +66,7 @@ window.onload = function ()
                 </select>
                 <select name="pwrsearchfld" class="editinput" onChange="Javascript:document.search.lstrt.value=0;top.oxid.admin.setSorting( document.search, 'oxarticles', this.value, 'asc');document.forms.search.submit();">
                     [{foreach from=$pwrsearchfields key=field item=desc}]
-                    [{assign var="ident" value=GENERAL_ARTICLE_$desc}]
+                    [{assign var="ident" value="GENERAL_ARTICLE_$desc"}]
                     [{assign var="ident" value=$ident|oxupper}]
                     <option value="[{$desc}]" [{if $pwrsearchfld == $desc|oxupper}]SELECTED[{/if}]>[{oxmultilang noerror=true alternative=$desc ident=$ident}]</option>
                     [{/foreach}]
@@ -93,7 +93,7 @@ window.onload = function ()
         [{block name="admin_article_list_sorting"}]
             <td class="listheader first" height="15" width="30" align="center"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'oxarticles', 'oxactive', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_ACTIVTITLE"}]</a></td>
             <td class="listheader"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'oxarticles', 'oxartnum', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_ARTNUM"}]</a></td>
-            <td class="listheader" height="15">&nbsp;<a href="Javascript:top.oxid.admin.setSorting( document.search, 'oxarticles', '[{$pwrsearchfld|oxlower}]', 'asc');document.search.submit();" class="listheader">[{assign var="ident" value=GENERAL_ARTICLE_$pwrsearchfld}][{assign var="ident" value=$ident|oxupper}][{oxmultilang ident=$ident}]</a></td>
+            <td class="listheader" height="15">&nbsp;<a href="Javascript:top.oxid.admin.setSorting( document.search, 'oxarticles', '[{$pwrsearchfld|oxlower}]', 'asc');document.search.submit();" class="listheader">[{assign var="ident" value="GENERAL_ARTICLE_$pwrsearchfld"}][{assign var="ident" value=$ident|oxupper}][{oxmultilang ident=$ident}]</a></td>
             <td class="listheader" colspan="2"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'oxarticles', 'oxshortdesc', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_SHORTDESC"}]</a></td>
         [{/block}]
     </tr>
@@ -106,12 +106,12 @@ window.onload = function ()
 
     [{block name="admin_article_list_item"}]
         [{if $listitem->blacklist == 1}]
-            [{assign var="listclass" value=listitem3}]
+            [{assign var="listclass" value="listitem3"}]
         [{else}]
-            [{assign var="listclass" value=listitem$blWhite}]
+            [{assign var="listclass" value="listitem$blWhite"}]
         [{/if}]
         [{if $listitem->oxarticles__oxid->value == $oxid}]
-            [{assign var="listclass" value=listitem4}]
+            [{assign var="listclass" value="listitem4"}]
         [{/if}]
         <td valign="top" class="[{$listclass}][{if $listitem->showActiveCheckInAdminPanel}] active[{/if}]" height="15"><div class="listitemfloating">&nbsp</a></div></td>
         <td valign="top" class="[{$listclass}]"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxarticles__oxid->value}]');" class="[{$listclass}]">[{$listitem->oxarticles__oxartnum->value}]</a></div></td>

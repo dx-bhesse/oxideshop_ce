@@ -157,6 +157,7 @@ window.onload = function ()
                     </table>
                   </td>
                 </tr>
+                [{/if}]
             [{/block}]
         <tr>
             <td class="edittext">
@@ -165,7 +166,6 @@ window.onload = function ()
                 [{include file="language_edit.tpl"}]
             </td>
         </tr>
-        [{/if}]
         <tr>
             <td class="edittext">
             </td>

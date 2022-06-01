@@ -58,7 +58,7 @@ class OrderMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
 
             $this->_aViewData["edit"] = $oOrder;
             $this->_aViewData["paymentType"] = $oOrder->getPaymentType();
-            $this->_aViewData["oShipSet"] = $oOrder->getShippingSetList();
+            $this->_aViewData["oShipSets"] = $oOrder->getShippingSetList();
 
             if ($oOrder->$sDelTypeField->value) {
                 // order user

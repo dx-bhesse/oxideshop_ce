@@ -78,12 +78,12 @@
 
                     [{block name="admin_category_list_item"}]
                         [{if $listitem->blacklist == 1}]
-                            [{assign var="listclass" value=listitem3}]
+                            [{assign var="listclass" value="listitem3"}]
                         [{else}]
-                            [{assign var="listclass" value=listitem$blWhite}]
+                            [{assign var="listclass" value="listitem$blWhite"}]
                         [{/if}]
                         [{if $listitem->getId() == $oxid}]
-                            [{assign var="listclass" value=listitem4}]
+                            [{assign var="listclass" value="listitem4"}]
                         [{/if}]
                         <td valign="top" class="[{$listclass}][{if $listitem->oxcategories__oxactive->value == 1}] active[{/if}]"><div class="listitemfloating">&nbsp;</div></td>
                         <td valign="top" class="[{$listclass}]" height="15" align="center"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxcategories__oxid->value}]');" class="[{$listclass}]">[{$listitem->oxcategories__oxsort->value}]</a></div></td>

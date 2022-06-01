@@ -103,9 +103,6 @@ function oxNew($className, ...$args)
 function ox_get_template($sTplName, &$sTplSource, $oSmarty)
 {
     $sTplSource = $oSmarty->oxidcache->value;
-    if (Registry::getConfig()->isDemoShop()) {
-        $oSmarty->security = true;
-    }
 
     return true;
 }

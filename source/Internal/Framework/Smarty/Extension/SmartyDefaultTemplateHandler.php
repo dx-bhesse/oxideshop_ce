@@ -38,7 +38,7 @@ class SmartyDefaultTemplateHandler
      * @param string $resourceName      template file name
      * @param string $resourceContent   template file content
      * @param int    $resourceTimestamp template file timestamp
-     * @param object $smarty            template processor object (smarty)
+     * @param \Smarty $smarty            template processor object (smarty)
      *
      * @return bool
      */
@@ -49,7 +49,7 @@ class SmartyDefaultTemplateHandler
             $resourceName = $loader->getPath($resourceName);
             $fileLoaded = is_file($resourceName) && is_readable($resourceName);
             if ($fileLoaded) {
-                $resourceContent = $smarty->_read_file($resourceName);
+                $resourceContent = $smarty->templateExists($resourceName);
                 $resourceTimestamp = filemtime($resourceName);
             }
 

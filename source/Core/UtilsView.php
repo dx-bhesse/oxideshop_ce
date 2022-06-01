@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
 use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectoryRepository;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator as EshopShopIdCalculator;
+use OxidEsales\EshopCommunity\Core\Smarty\OxidSmartySecurityPolicy;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\TemplateExtension\TemplateBlockLoaderBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
@@ -233,7 +234,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
 
         return $renderer->renderFragment(
             $description,
-            "ox:{$oxid}{$activeLanguageId}",
+            "ox_{$oxid}_{$activeLanguageId}",
             $context
         );
     }
@@ -365,34 +366,25 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
         $smarty->left_delimiter = '[{';
         $smarty->right_delimiter = '}]';
 
-        $smarty->register_resource(
-            'ox',
-            [
-                'ox_get_template',
-                'ox_get_timestamp',
-                'ox_get_secure',
-                'ox_get_trusted'
-            ]
-        );
-
         $smartyDir = $this->getSmartyDir();
 
-        $smarty->caching = false;
-        $smarty->compile_dir = $smartyDir;
-        $smarty->cache_dir = $smartyDir;
-        $smarty->template_dir = $this->getTemplateDirs();
+        $smarty->caching = Smarty::CACHING_OFF;
+        $smarty->auto_literal=false; // if true whitespace behind '[{' makes Smarty not considering it as smarty-code!
+        $smarty->setCompileDir($smartyDir);
+        $smarty->setCacheDir($smartyDir);
+        $smarty->setTemplateDir($this->getTemplateDirs());
         $smarty->compile_id = $this->getTemplateCompileId();
         $smarty->default_template_handler_func = [\OxidEsales\Eshop\Core\Registry::getUtilsView(), '_smartyDefaultTemplateHandler'];
 
-        $smarty->plugins_dir = array_merge(
+        $smarty->setPluginsDir(array_merge(
             $this->getSmartyPluginDirectories(),
-            $smarty->plugins_dir
-        );
+            $smarty->getPluginsDir()
+        ));
 
         $coreDirectory = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sCoreDir');
 
-        include_once $coreDirectory . 'Smarty/Plugin/prefilter.oxblock.php';
-        $smarty->register_prefilter('smarty_prefilter_oxblock');
+        $smarty->loadPlugin('smarty_prefilter_oxblock');
+        $smarty->registerFilter('pre','smarty_prefilter_oxblock');
 
         $debugMode = $config->getConfigParam('iDebug');
         if ($debugMode == 1 || $debugMode == 3 || $debugMode == 4) {
@@ -400,28 +392,11 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
         }
 
         if ($debugMode == 8 && !$config->isAdmin()) {
-            include_once $coreDirectory . 'Smarty/Plugin/prefilter.oxtpldebug.php';
-            $smarty->register_prefilter('smarty_prefilter_oxtpldebug');
+            $smarty->loadPlugin('smarty_prefilter_oxtpldebug');
+            $smarty->registerFilter('pre','smarty_prefilter_oxtpldebug');
         }
 
-        //demo shop security
-        if (!$config->isDemoShop()) {
-            $smarty->php_handling = (int) $config->getConfigParam('iSmartyPhpHandling');
-            $smarty->security = false;
-        } else {
-            $smarty->php_handling = SMARTY_PHP_REMOVE;
-            $smarty->security = true;
-            $smarty->security_settings['IF_FUNCS'][] = 'XML_ELEMENT_NODE';
-            $smarty->security_settings['IF_FUNCS'][] = 'is_int';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'round';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'floor';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'trim';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'implode';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'is_array';
-            $smarty->security_settings['MODIFIER_FUNCS'][] = 'getimagesize';
-            $smarty->security_settings['ALLOW_CONSTANTS'] = true;
-            $smarty->secure_dir = $smarty->template_dir;
-        }
+        $smarty->enableSecurity(OxidSmartySecurityPolicy::class);
     }
 
     /**
@@ -458,15 +433,20 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      *
      * @deprecated since v6.4 (2019-10-10); Use TemplateRendererBridgeInterface
      *
-     * @param object $smarty template processor object (smarty)
+     * @param Smarty $smarty template processor object (smarty)
      */
     protected function _smartyCompileCheck($smarty) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $smarty->compile_check = $config->getConfigParam('blCheckTemplates');
+        if ($config->getConfigParam('blCheckTemplates')) {
+            $smarty->compile_check = Smarty::COMPILECHECK_ON;
+        }
+        else{
+            $smarty->compile_check = Smarty::COMPILECHECK_OFF;
+        }
         if ($config->isProductiveMode()) {
             // override in any case
-            $smarty->compile_check = false;
+            $smarty->compile_check = Smarty::COMPILECHECK_OFF;
         }
     }
 
@@ -479,7 +459,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      * @param string $resourceName      template file name
      * @param string $resourceContent   template file content
      * @param int    $resourceTimestamp template file timestamp
-     * @param object $smarty            template processor object (smarty)
+     * @param Smarty $smarty            template processor object (smarty)
      *
      * @return bool
      */
@@ -488,10 +468,12 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         if ($resourceType == 'file' && !is_readable($resourceName)) {
             $resourceName = $config->getTemplatePath($resourceName, $config->isAdmin());
-            $resourceContent = $smarty->_read_file($resourceName);
-            $resourceTimestamp = filemtime($resourceName);
+            if ($resourceName) {
+                $resourceContent = $smarty->_read_file($resourceName);
+                $resourceTimestamp = filemtime($resourceName);
 
-            return is_file($resourceName) && is_readable($resourceName);
+                return is_file($resourceName) && is_readable($resourceName);
+            }
         }
 
         return false;

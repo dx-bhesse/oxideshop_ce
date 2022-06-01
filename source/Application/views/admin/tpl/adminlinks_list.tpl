@@ -77,12 +77,12 @@ window.onload = function ()
 
         [{block name="admin_adminlinks_list_item"}]
             [{if $listitem->blacklist == 1}]
-                [{assign var="listclass" value=listitem3}]
+                [{assign var="listclass" value="listitem3"}]
             [{else}]
-                [{assign var="listclass" value=listitem$blWhite}]
+                [{assign var="listclass" value="listitem$blWhite"}]
             [{/if}]
             [{if $listitem->getId() == $oxid}]
-                [{assign var="listclass" value=listitem4}]
+                [{assign var="listclass" value="listitem4"}]
             [{/if}]
             <td valign="top" class="[{$listclass}][{if $listitem->oxlinks__oxactive->value == 1}] active[{/if}]" height="15"><div class="listitemfloating">&nbsp</a></div></td>
             <td valign="top" class="[{$listclass}]" height="15"><div class="listitemfloating">&nbsp;<a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxlinks__oxid->value}]');" class="[{$listclass}]">[{$listitem->oxlinks__oxinsert|oxformdate}]</a></div></td>

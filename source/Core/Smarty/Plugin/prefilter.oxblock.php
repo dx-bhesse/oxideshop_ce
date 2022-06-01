@@ -12,16 +12,12 @@
  * Else, replace block tags to smarty comments.
  *
  * @param string $sSource          source content
- * @param object &$oSmartyCompiler smarty compiler instance
+ * @param Smarty_Internal_Template $oSmartyCompiler smarty compiler instance
  *
  * @return string
  */
-function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
+function smarty_prefilter_oxblock($sSource, Smarty_Internal_Template $oSmartyCompiler)
 {
-    $blUseSmarty3 = false;
-    if (strpos($oSmartyCompiler->_version, 'Smarty3') === 0) {
-        $blUseSmarty3 = true;
-    }
     $blDebugTemplateBlocks = (bool)\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blDebugTemplateBlocks');
 
     $aBlocks = \OxidEsales\Eshop\Core\Registry::getUtilsView()->getTemplateBlocks($oSmartyCompiler->_current_file);
@@ -40,10 +36,8 @@ function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
         }
         $sPrepend = '';
         $sAppend  = '';
-        if ($blUseSmarty3) {
-            $sPrepend = '[{__smartyblock__ name="' . $sBlockName . '"}]' . $sPrepend;
-            $sAppend .= '[{/__smartyblock__}]';
-        }
+        $sPrepend = '[{__smartyblock__ name="' . $sBlockName . '"}]' . $sPrepend;
+        $sAppend .= '[{/__smartyblock__}]';
         if ($blDebugTemplateBlocks) {
             $sTplDir = trim(\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('_sTemplateDir'), '/\\');
             $sFile = str_replace(['\\', '//'], '/', $oSmartyCompiler->_current_file);
@@ -73,14 +67,8 @@ function smarty_prefilter_oxblock($sSource, &$oSmartyCompiler)
         }
     }
     if (!$iLimit) {
-        if ($blUseSmarty3) {
-            $oSmartyCompiler->trigger_error("block tags mismatch (or there are more than 500 blocks in one file).", E_USER_ERROR);
-        } else {
-            $oSmartyCompiler->_syntax_error("block tags mismatch (or there are more than 500 blocks in one file).", E_USER_ERROR, __FILE__, __LINE__);
-        }
+        $oSmartyCompiler->trigger_error("block tags mismatch (or there are more than 500 blocks in one file).", E_USER_ERROR);
     }
-    if ($blUseSmarty3) {
-        $sSource = str_replace('__smartyblock__', 'block', $sSource);
-    }
+    $sSource = str_replace('__smartyblock__', 'block', $sSource);
     return $sSource;
 }

@@ -39,9 +39,6 @@ class CacheResourcePlugin
         if (isset($smarty->oxidcache) && isset($smarty->oxidcache->value)) {
             $templateSource = $smarty->oxidcache->value;
         }
-        if (self::$context->getTemplateSecurityMode()) {
-            $smarty->security = true;
-        }
 
         return true;
     }

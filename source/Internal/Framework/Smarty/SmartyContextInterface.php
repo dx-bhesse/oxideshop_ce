@@ -22,11 +22,6 @@ interface SmartyContextInterface
     public function showTemplateNames(): bool;
 
     /**
-     * @return bool
-     */
-    public function getTemplateSecurityMode(): bool;
-
-    /**
      * @return string
      */
     public function getTemplateCompileDirectory(): string;
@@ -50,11 +45,6 @@ interface SmartyContextInterface
      * @return array
      */
     public function getSmartyPluginDirectories(): array;
-
-    /**
-     * @return int
-     */
-    public function getTemplatePhpHandlingMode(): int;
 
     /**
      * @param string $templateName

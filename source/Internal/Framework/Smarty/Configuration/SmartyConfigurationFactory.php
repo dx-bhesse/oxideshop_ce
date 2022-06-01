@@ -30,9 +30,6 @@ class SmartyConfigurationFactory implements SmartyConfigurationFactoryInterface
     {
         $smartyConfiguration = new SmartyConfiguration();
         $smartyConfiguration->setSettings($this->settingsDataProvider->getSettings());
-        if ($this->context->getTemplateSecurityMode()) {
-            $smartyConfiguration->setSecuritySettings($this->securitySettingsDataProvider->getSecuritySettings());
-        }
         $smartyConfiguration->setResources($this->resourcesDataProvider->getResources());
         $smartyConfiguration->setPrefilters($this->prefiltersDataProvider->getPrefilterPlugins());
         $smartyConfiguration->setPlugins($this->pluginsDataProvider->getPlugins());

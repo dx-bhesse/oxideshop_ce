@@ -41,14 +41,6 @@ class SmartyContext implements SmartyContextInterface
     }
 
     /**
-     * @return bool
-     */
-    public function getTemplateSecurityMode(): bool
-    {
-        return $this->getDemoShopMode();
-    }
-
-    /**
      * @return string
      */
     public function getTemplateCompileDirectory(): string
@@ -91,14 +83,6 @@ class SmartyContext implements SmartyContextInterface
     public function getSmartyPluginDirectories(): array
     {
         return $this->utilsView->getSmartyPluginDirectories();
-    }
-
-    /**
-     * @return int
-     */
-    public function getTemplatePhpHandlingMode(): int
-    {
-        return (int) $this->getConfigParameter('iSmartyPhpHandling');
     }
 
     /**

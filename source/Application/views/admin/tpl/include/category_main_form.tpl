@@ -126,7 +126,7 @@
                 <select name="editval[oxcategories__oxdefsort]" class="editinput" onChange="JavaScript:SchnellSortManager(this);">
                     <option value="">[{oxmultilang ident="CATEGORY_MAIN_NONE"}]</option>
                     [{foreach from=$sortableFields key=field item=desc}]
-                        [{assign var="ident" value=GENERAL_ARTICLE_$desc}]
+                        [{assign var="ident" value="GENERAL_ARTICLE_$desc"}]
                         [{assign var="ident" value=$ident|oxupper}]
                         <option value="[{$desc}]" [{if $defsort == $desc}]SELECTED[{/if}]>[{oxmultilang|oxtruncate:20:"..":true ident=$ident}]</option>
                     [{/foreach}]

@@ -32,7 +32,6 @@ function smarty_function_oxcontent($params, &$smarty)
     if (!Registry::getConfig()->getActiveShop()->isProductiveMode()) {
         $text = sprintf('<b>content not found ! check ident(%s) !</b>', $loadId ?? 'undefined');
     }
-    $smarty->oxidcache = new Field($text, Field::T_RAW);
 
     if ($id || $loadId) {
         $content = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
@@ -43,18 +42,22 @@ function smarty_function_oxcontent($params, &$smarty)
             if (Registry::getConfig()->getConfigParam('deactivateSmartyForCmsContent')) {
                 $text = $content->$property->value;
             } else {
-                $smarty->oxidcache = clone $content->$property;
-                $smarty->compile_check = true;
-                $resourceName = sprintf(
-                    'ox:%s%s%s%s%s',
-                    (string)$loadId,
-                    (string)$id,
-                    $field,
-                    Registry::getLang()->getBaseLanguage(),
-                    Registry::getConfig()->getShopId()
-                );
-                $text = $smarty->fetch($resourceName);
-                $smarty->compile_check = Registry::getConfig()->getConfigParam('blCheckTemplates');
+                $text = '';
+                if ($content->$property instanceof Field) {
+                    $text = $content->$property->value;
+
+                    $smarty->compile_check = true;
+                    $compileId = sprintf(
+                        'ox-%s-%s-%s-%s-%s',
+                        (string)$loadId,
+                        (string)$id,
+                        $field,
+                        Registry::getLang()->getBaseLanguage(),
+                        Registry::getConfig()->getShopId()
+                    );
+                    $text = $smarty->fetch("string:" . $text, $compileId,$compileId);
+                    $smarty->compile_check = Registry::getConfig()->getConfigParam('blCheckTemplates');
+                }
             }
         }
     }

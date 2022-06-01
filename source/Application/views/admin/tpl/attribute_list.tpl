@@ -60,12 +60,12 @@ window.onload = function ()
     <tr id="row.[{$_cnt}]">
         [{block name="admin_attribute_list_item"}]
             [{if $listitem->blacklist == 1}]
-                [{assign var="listclass" value=listitem3}]
+                [{assign var="listclass" value="listitem3"}]
             [{else}]
-                [{assign var="listclass" value=listitem$blWhite}]
+                [{assign var="listclass" value="listitem$blWhite"}]
             [{/if}]
             [{if $listitem->getId() == $oxid}]
-                [{assign var="listclass" value=listitem4}]
+                [{assign var="listclass" value="listitem4"}]
             [{/if}]
             <td valign="top" class="[{$listclass}]" height="15"><div class="listitemfloating">&nbsp;<a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxattribute__oxid->value}]');" class="[{$listclass}]">[{if $listitem->oxattribute__oxtitle->value}][{$listitem->oxattribute__oxtitle->value}][{else}]--[{/if}]</a></div></td>
             <td class="[{$listclass}]">

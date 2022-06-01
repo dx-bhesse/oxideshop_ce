@@ -29,8 +29,31 @@ function smarty_function_oxeval($aParams, &$oSmarty)
     $deactivateSmarty = Registry::getConfig()->getConfigParam('deactivateSmartyForCmsContent');
     $processLongDescriptions = Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty') || isset($aParams['force']);
     if (!$deactivateSmarty && $processLongDescriptions) {
-        include_once $oSmarty->_get_plugin_filepath('function', 'eval');
-        return smarty_function_eval($aParams, $oSmarty);
+        $oSmarty->loadPlugin('smarty_function_eval');
+
+        $y='string:';
+        $k=0;
+        foreach($aParams as $pName => $pVal) {
+            $y .= '[{capture assign="oxeval' . $k . '"}]';
+            $y .= $pVal;
+            $y .= '[{/capture}]';
+            $k++;
+        }
+        $y.='[{eval ';
+        $k=0;
+        foreach($aParams as $pName => $pVal)
+        {
+            if ($k>0)
+            {
+                $y.=' ';
+            }
+            $y.=$pName;
+            $y.='=$oxeval'.$k;
+            $k++;
+        }
+        $y.='}]';
+
+        return $oSmarty->fetch($y);
     }
 
     return $aParams['var'];

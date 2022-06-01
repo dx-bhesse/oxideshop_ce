@@ -1086,7 +1086,7 @@ class Language extends \OxidEsales\Eshop\Core\Base
      */
     protected function sortLanguagesCallback($a1, $a2)
     {
-        return ($a1->sort > $a2->sort);
+        return ($a1->sort - $a2->sort);
     }
 
     /**

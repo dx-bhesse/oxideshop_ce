@@ -69,7 +69,7 @@ class SmartyEngine implements TemplateEngineInterface
      */
     public function exists(string $name): bool
     {
-        return $this->engine->template_exists($name);
+        return $this->engine->templateExists($name);
     }
 
     /**
