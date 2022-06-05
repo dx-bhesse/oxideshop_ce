@@ -90,9 +90,6 @@ class FunctionsTest extends \OxidTestCase
         $sRes = 'aa';
         $this->assertEquals(true, ox_get_template('blah', $sRes, $fake));
         $this->assertEquals('test', $sRes);
-        if ($this->getConfig()->isDemoShop()) {
-            $this->assertEquals($fake->security, true);
-        }
     }
 
     public function testOx_get_timestamp()

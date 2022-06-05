@@ -62,10 +62,6 @@ class SmartySettingsDataProviderTest extends TestCase
             ->willReturn(true);
 
         $smartyContextMock
-            ->method('getTemplatePhpHandlingMode')
-            ->willReturn(1);
-
-        $smartyContextMock
             ->method('getTemplateCompileId')
             ->willReturn('7f96e0d92070fd4733296e5118fd5a01');
 

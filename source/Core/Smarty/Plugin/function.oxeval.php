@@ -29,31 +29,38 @@ function smarty_function_oxeval($aParams, &$oSmarty)
     $deactivateSmarty = Registry::getConfig()->getConfigParam('deactivateSmartyForCmsContent');
     $processLongDescriptions = Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty') || isset($aParams['force']);
     if (!$deactivateSmarty && $processLongDescriptions) {
-        $oSmarty->loadPlugin('smarty_function_eval');
 
-        $y='string:';
-        $k=0;
-        foreach($aParams as $pName => $pVal) {
-            $y .= '[{capture assign="oxeval' . $k . '"}]';
-            $y .= $pVal;
-            $y .= '[{/capture}]';
-            $k++;
-        }
-        $y.='[{eval ';
-        $k=0;
-        foreach($aParams as $pName => $pVal)
-        {
-            if ($k>0)
-            {
-                $y.=' ';
+        // Params that can be passed to Smartys eval():
+        $aValidSmartyParams = ['var', 'assign'];
+
+        // Smartys built-in eval() cannot be called directly:
+        $smartyContent = 'string:';
+
+        // Store params in oxeval_{random}_paramName variables:
+        // ({random} included in case oxeval is nested)
+        $variablePrefix='oxeval_'.Registry::getUtilsObject()->generateUId().'_';
+        foreach ($aValidSmartyParams as $paramName) {
+            if (isset($aParams[$paramName])) {
+                $oSmarty->assign($variablePrefix. $paramName, $aParams[$paramName]);
             }
-            $y.=$pName;
-            $y.='=$oxeval'.$k;
-            $k++;
         }
-        $y.='}]';
 
-        return $oSmarty->fetch($y);
+        // Call eval() with stored oxevalXXX-variables as params:
+        $smartyContent .= '[{eval ';
+        $k = 0;
+        foreach ($aValidSmartyParams as $paramName) {
+            if (isset($aParams[$paramName])) {
+                if ($k > 0) {
+                    $smartyContent .= ' ';
+                }
+                $smartyContent .= $paramName;
+                $smartyContent .= '=$'.$variablePrefix . $paramName;
+                $k++;
+            }
+        }
+        $smartyContent .= '}]';
+
+        return $oSmarty->fetch($smartyContent);
     }
 
     return $aParams['var'];

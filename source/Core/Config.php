@@ -1227,43 +1227,50 @@ class Config extends \OxidEsales\Eshop\Core\Base
         $return = $this->getEditionTemplate("{$theme}/{$dir}/{$file}");
 
         // Check for custom template
-        $customTheme = $this->getConfigParam('sCustomTheme');
-        if (!$return && !$admin && !$ignoreCust && $customTheme && $customTheme != $theme) {
-            $return = $this->getDir($file, $dir, $admin, $lang, $shop, $customTheme, $absolute);
+        if (!$admin && !$ignoreCust) {
+            $childTheme = $this->getConfigParam('sCustomTheme');
+            if ($childTheme) {
+                $theme = $childTheme;
+            }
         }
 
-        //test lang level ..
-        if (!$return && !$admin && is_readable($absBase . $path)) {
-            $return = $base . $path;
-        }
+        $themeIds=oxNew(\OxidEsales\Eshop\Core\Theme::class)->getThemeIdChain($theme);
+        foreach($themeIds as $theme) {
 
-        //test shop level ..
-        if (!$return && !$admin) {
-            $return = $this->getShopLevelDir($base, $absBase, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignoreCust);
-        }
+            //test lang level ..
+            $path = "{$theme}/{$shop}/{$langAbbr}/{$dir}/{$file}";
+            if (!$return && !$admin && is_readable($absBase . $path)) {
+                $return = $base . $path;
+            }
 
-        //test theme language level ..
-        $path = "$theme/$langAbbr/$dir/$file";
-        if (!$return && $lang !== false && is_readable($absBase . $path)) {
-            $return = $base . $path;
-        }
+            //test shop level ..
+            if (!$return && !$admin) {
+                $return = $this->getShopLevelDir($base, $absBase, $file, $dir, $admin, $lang, $shop, $theme, $absolute, $ignoreCust);
+            }
 
-        //test theme level ..
-        $path = "$theme/$dir/$file";
-        if (!$return && is_readable($absBase . $path)) {
-            $return = $base . $path;
-        }
+            //test theme language level ..
+            $path = "$theme/$langAbbr/$dir/$file";
+            if (!$return && $lang !== false && is_readable($absBase . $path)) {
+                $return = $base . $path;
+            }
 
-        //test out language level ..
-        $path = "$langAbbr/$dir/$file";
-        if (!$return && $lang !== false && is_readable($absBase . $path)) {
-            $return = $base . $path;
-        }
+            //test theme level ..
+            $path = "$theme/$dir/$file";
+            if (!$return && is_readable($absBase . $path)) {
+                $return = $base . $path;
+            }
 
-        //test out level ..
-        $path = "$dir/$file";
-        if (!$return && is_readable($absBase . $path)) {
-            $return = $base . $path;
+            //test out language level ..
+            $path = "$langAbbr/$dir/$file";
+            if (!$return && $lang !== false && is_readable($absBase . $path)) {
+                $return = $base . $path;
+            }
+
+            //test out level ..
+            $path = "$dir/$file";
+            if (!$return && is_readable($absBase . $path)) {
+                $return = $base . $path;
+            }
         }
 
         // TODO: implement logic to log missing paths

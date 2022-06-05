@@ -468,11 +468,10 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         if ($resourceType == 'file' && !is_readable($resourceName)) {
             $resourceName = $config->getTemplatePath($resourceName, $config->isAdmin());
-            if ($resourceName) {
-                $resourceContent = $smarty->_read_file($resourceName);
+            if ($resourceName && is_file($resourceName) && is_readable($resourceName)) {
+                $resourceContent = file_get_contents($resourceName);
                 $resourceTimestamp = filemtime($resourceName);
-
-                return is_file($resourceName) && is_readable($resourceName);
+                return true;
             }
         }
 

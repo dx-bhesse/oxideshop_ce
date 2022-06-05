@@ -79,18 +79,6 @@ class SmartyContextTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($result, $smartyContext->showTemplateNames());
     }
 
-    public function testGetTemplateSecurityMode()
-    {
-        $config = $this->getConfigMock();
-        $config->method('isDemoShop')
-            ->will($this->returnValue(true));
-
-        $utilsView = $this->getUtilsViewMock();
-
-        $smartyContext = new SmartyContext(new BasicContextStub(), $config, $utilsView);
-        $this->assertSame(true, $smartyContext->getTemplateSecurityMode());
-    }
-
     public function testGetTemplateCompileCheckMode()
     {
         $config = $this->getConfigMock();
@@ -117,19 +105,6 @@ class SmartyContextTest extends \PHPUnit\Framework\TestCase
 
         $smartyContext = new SmartyContext(new BasicContextStub(), $config, $utilsView);
         $this->assertFalse($smartyContext->getTemplateCompileCheckMode());
-    }
-
-    public function testGetTemplatePhpHandlingMode()
-    {
-        $config = $this->getConfigMock();
-        $config->method('getConfigParam')
-            ->with('iSmartyPhpHandling')
-            ->will($this->returnValue(1));
-
-        $utilsView = $this->getUtilsViewMock();
-
-        $smartyContext = new SmartyContext(new BasicContextStub(), $config, $utilsView);
-        $this->assertSame(1, $smartyContext->getTemplatePhpHandlingMode());
     }
 
     public function testGetSmartyPluginDirectories()

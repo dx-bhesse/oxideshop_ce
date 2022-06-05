@@ -111,7 +111,7 @@ class Theme extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Return current active theme, or custom theme if specified
+     * Returns the currently active frontend theme id
      *
      * @return string
      */
@@ -126,7 +126,33 @@ class Theme extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Get active themes list.
+     * Returns the ids of the active theme and its parent themes
+     * (e.g. ['childchildtheme','childtheme','wave'])
+     * @param $theme
+     * @return string[]
+     */
+    public function getThemeIdChain($theme)
+    {
+        $themeIds=[];
+        $checkThemeId=$theme;
+        while($checkThemeId)
+        {
+            $themeIds[]=$checkThemeId;
+            $oTheme=oxNew(\OxidEsales\Eshop\Core\Theme::class);
+            if ($oTheme->load($checkThemeId))
+            {
+                $checkThemeId=$oTheme->getParentId();
+            }
+            else{
+                $checkThemeId='';
+            }
+        }
+
+        return $themeIds;
+    }
+
+    /**
+     * Gets ids of active theme and their parents.
      * Examples:
      *      if flow theme is active we will get ['flow']
      *      if azure is extended by some other we will get ['azure', 'extending_theme']
@@ -135,18 +161,29 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      */
     public function getActiveThemesList()
     {
-        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-
         $activeThemeList = [];
         if (!$this->isAdmin()) {
-            $activeThemeList[] = $config->getConfigParam('sTheme');
 
-            if ($customThemeId = $config->getConfigParam('sCustomTheme')) {
-                $activeThemeList[] = $customThemeId;
+            $themeId=$this->getActiveThemeId();
+            while($themeId)
+            {
+                $oTheme=oxNew(Theme::class);
+                if ($oTheme->load($themeId))
+                {
+                    $activeThemeList[]=$themeId;
+                    $themeId=$oTheme->getParentId();
+                }
             }
+
+            $activeThemeList=array_reverse($activeThemeList);
         }
 
         return $activeThemeList;
+    }
+
+    public function getParentId()
+    {
+        return $this->getInfo('parentTheme');
     }
 
     /**
@@ -156,7 +193,7 @@ class Theme extends \OxidEsales\Eshop\Core\Base
      */
     public function getParent()
     {
-        $sParent = $this->getInfo('parentTheme');
+        $sParent = $this->getParentId();
         if (!$sParent) {
             return null;
         }

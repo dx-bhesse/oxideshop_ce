@@ -18,28 +18,23 @@ class CacheResourcePluginTest extends \PHPUnit\Framework\TestCase
     {
         $smarty = $this->getMockBuilder(\Smarty::class)->getMock();
         $smarty->oxidcache = new \OxidEsales\Eshop\Core\Field('newValue', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $smarty->security = false;
-
         $resource = $this->getSmartyExtensionObject();
 
         $tplSource = 'initialValue';
         $this->assertTrue($resource::getTemplate('templateName', $tplSource, $smarty));
         $this->assertSame('newValue', $tplSource);
-        $this->assertFalse($smarty->security);
     }
 
     public function testGetTemplateIfDemoShopIsActive()
     {
         $smarty = $this->getMockBuilder(\Smarty::class)->getMock();
         $smarty->oxidcache = new \OxidEsales\Eshop\Core\Field('newValue', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $smarty->security = false;
 
         $resource = $this->getSmartyExtensionObject(true);
 
         $tplSource = 'initialValue';
         $this->assertTrue($resource::getTemplate('templateName', $tplSource, $smarty));
         $this->assertSame('newValue', $tplSource);
-        $this->assertTrue($smarty->security);
     }
 
     public function testGetTimestamp()
@@ -90,10 +85,6 @@ class CacheResourcePluginTest extends \PHPUnit\Framework\TestCase
         $smartyContextMock = $this
         ->getMockBuilder(SmartyContextInterface::class)
         ->getMock();
-
-        $smartyContextMock
-            ->method('getTemplateSecurityMode')
-            ->willReturn($securityMode);
 
         return new CacheResourcePlugin($smartyContextMock);
     }

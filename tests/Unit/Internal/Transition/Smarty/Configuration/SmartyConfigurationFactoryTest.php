@@ -63,10 +63,6 @@ class SmartyConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
             ->getMockBuilder(SmartyContextInterface::class)
             ->getMock();
 
-        $smartyContextMock
-            ->method('getTemplateSecurityMode')
-            ->willReturn($securityMode);
-
         return $smartyContextMock;
     }
 

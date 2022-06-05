@@ -511,8 +511,8 @@ class UtilsViewTest extends \OxidTestCase
         $aCheck = $this->getSmartyCheckArrayForFillCommonSmartyPropertiesAndSmartyCompileCheck($config, $compileDirectory);
         $aCheck['template_dir'] = $aTemplatesDir;
 
-        $oSmarty = $this->getMock('\Smarty', ['register_resource']);
-        $oSmarty->expects($this->once())->method('register_resource');
+        $oSmarty = $this->getMock('\Smarty', ['registerResource']);
+        $oSmarty->expects($this->once())->method('registerResource');
 
         $oUtilsView = oxNew('oxUtilsView');
         Registry::set(Config::class, $config);
